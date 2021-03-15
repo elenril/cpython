@@ -2568,6 +2568,14 @@ class TestParser(TestParserMixin, TestEmailBase):
         self.assertEqual(str(address_list.addresses[1]),
                          str(address_list.mailboxes[2]))
 
+    def test_get_address_list_trailing_garbage(self):
+        address_list = self._test_get_x(parser.get_address_list,
+            'unlisted-recipients:; (no To-header on input)',
+            'unlisted-recipients:; (no To-header on input)',
+            'unlisted-recipients:; ',
+            [errors.InvalidHeaderDefect]*2 + [errors.ObsoleteHeaderDefect],
+            '')
+
     def test_invalid_content_disposition(self):
         content_disp = self._test_parse_x(
             parser.parse_content_disposition_header,
