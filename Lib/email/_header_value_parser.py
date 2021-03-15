@@ -2013,12 +2013,15 @@ def get_address_list(value):
                 address_list.defects.append(errors.InvalidHeaderDefect(
                     "invalid address in address-list"))
         if value and value[0] != ',':
-            # Crap after address; treat it as an invalid mailbox.
-            # The mailbox info will still be available.
-            mailbox = address_list[-1][0]
-            mailbox.token_type = 'invalid-mailbox'
+            # Crap after address: if it's a single address then treat its
+            # mailbox as invalid. If it's a group, then just append the crap to
+            # it. The mailbox info will still be available.
+            dst = address_list[-1][0]
+            if dst.token_type != 'group':
+                dst.token_type = 'invalid-mailbox'
+
             token, value = get_invalid_mailbox(value, ',')
-            mailbox.extend(token)
+            dst.extend(token)
             address_list.defects.append(errors.InvalidHeaderDefect(
                 "invalid address in address-list"))
         if value:  # Must be a , at this point.
